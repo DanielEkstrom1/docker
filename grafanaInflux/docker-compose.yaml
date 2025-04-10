@@ -1,0 +1,23 @@
+version: "3"
+services:
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: always
+    environment:
+      - TZ=Europe/Stockholm
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana_data:/var/lib/grafana:Z
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb_container
+    restart: always
+    environment:
+      - TZ=Europe/Stockholm
+    ports:
+      - 8086:8086
+      - 8089:8089/udp
+    volumes:
+      - ./influx_data:/var/lib/influxdb2

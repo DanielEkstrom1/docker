@@ -1,0 +1,14 @@
+http:
+  metrics:
+    prometheus:
+      port: ":8084"
+  proxy:
+    ssh:
+      listen: 8080
+      ssh_key_file: ./ssh/id_rsa
+      ssh_pub_key_file: ./ssh/id_rsa.pub
+      known_hosts_file: ./ssh/known_hosts
+      target:
+        user: 
+        port: ":22"
+        host: 

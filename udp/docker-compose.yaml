@@ -1,0 +1,22 @@
+---
+services:
+  elogger:
+    container_name: elogger
+    image: baller/elogger:latest
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - 5005:5005/udp 
+    environment:
+      - bucket=e-logger
+      - org=proxmox
+      - token=<token>
+      - url=
+      - UDP_IP=0.0.0.0
+      - UDP_PORT=5005
+      - MY_IP=
+      - TZ=Europe/Stockholm
+    restart: unless-stopped
+

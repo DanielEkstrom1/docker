@@ -1,0 +1,27 @@
+---
+version: "2.1"
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    group_add:
+      - "106" 
+    environment:
+      - TZ=Sweden/Stockholm
+      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
+    volumes:
+      - ./jellyfin/library:/config
+      - media:/data
+      - /dev/shm:/transcode:rw
+    ports: 
+      - 8096:8096
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    restart: unless-stopped
+
+volumes:
+ media:
+  driver_opts:
+   type: cifs
+   device: 
+   o:

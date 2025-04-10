@@ -1,0 +1,11 @@
+services:
+  ssh-proxy:
+    container_name: proxy
+    image: baller/proxy
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ./config.yml:/app/config.yml
+      - ./access_log.log:/app/access_log.log
+      - ./ssh:/app/ssh
+        

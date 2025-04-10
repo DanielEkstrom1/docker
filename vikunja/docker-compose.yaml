@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  api:
+    image: vikunja/api
+    environment:
+      VIKUNJA_REDIS_ENABLED: 1
+      VIKUNJA_REDIS_HOST: 'redis:6379'
+      VIKUNJA_CACHE_ENABLED: 1
+      VIKUNJA_CACHE_TYPE: redis
+    volumes:
+      - ./files:/app/vikunja/files
+    restart: always
+    networks:
+      - web
+      - default
+      - proxy
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.vikunja-api.rule=Host(`vikunja.ekstromhomelab.com`) && (PathPrefix(`/api/v1`) || PathPrefix(`/dav/`) || PathPrefix(`/.well-known/`))'
+      - 'traefik.http.routers.vikunja-api.entrypoints=https'
+      - 'traefik.http.routers.vikunja-api.tls.certResolver=acme'
+      - 'traefik.docker.network=proxy'
+  redis:
+    image: redis
+    networks:
+      - web
+      - default
+    restart: unless-stopped
+  frontend:
+    image: vikunja/frontend
+    restart: unless-stopped
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.vikunja-frontend.rule=Host(`vikunja.ekstromhomelab.com`)'
+      - 'traefik.http.routers.vikunja-frontend.entrypoints=https'
+      - 'traefik.http.routers.vikunja-frontend.tls=true'
+      - 'traefik.docker.network=proxy'
+    networks:
+      - web
+      - default
+      - proxy
+
+networks:
+  web:
+    external: true
+  proxy:
+    external: true

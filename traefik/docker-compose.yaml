@@ -1,0 +1,45 @@
+version: '3'
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+      - 8082:8082
+    environment:
+      - CF_API_EMAIL=
+      - CF_API_KEY=
+      - CF_ZONE_API_TOKEN=
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/traefik.yml:/traefik.yml
+      - ./data/acme.json:/acme.json
+      - ./data/config.yml:/config.yml
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefik.entrypoints=http'
+      - 'traefik.http.routers.traefik.rule=Host(`traefik.ekstromhomelab.com`)'
+      - 'traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$Q/7HVUuO$$oCpD3QwAOLQ/4GBIJtdqm1'
+      - 'traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https'
+      - 'traefik.http.routers.traefik.middlewares=traefik-https-redirect'
+      - 'traefik.http.routers.traefik-secure.entrypoints=https'
+      - 'traefik.http.routers.traefik-secure.rule=Host(`traefik.ekstromhomelab.com`)'
+      - 'traefik.http.routers.traefik-secure.middlewares=traefik-auth'
+      - 'traefik.http.routers.traefik-secure.tls=true'
+      - 'traefik.http.routers.traefik-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.traefik-secure.tls.domains[0].main=ekstromhomelab.com'
+      - 'traefik.http.routers.traefik-secure.tls.domains[0].sans=*.ekstromhomelab.com*'
+      - 'traefik.http.routers.traefik-secure.tls.domains[0].sans=*.ekstromhomelab.com'
+      - 'traefik.http.routers.traefik-secure.service=api@internal'
+
+networks:
+  proxy:
+    external: true
